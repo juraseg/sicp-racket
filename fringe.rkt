@@ -1,0 +1,11 @@
+#lang racket
+(define (fringe items)
+  (define (iter x result)
+    (if (not (pair? (car x)))
+        (if (null? (cdr x))
+            (append result (list (car x)))
+            (iter (cdr x) (append result (list (car x)))))
+        (if (null? (cdr x))
+            (iter (car x) result)
+            (iter (cdr x) (append result (fringe (car x)))))))
+  (iter items (list)))

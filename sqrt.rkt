@@ -1,0 +1,11 @@
+(define (my-sqrt x)
+  (define (good-enough? old-guess guess)
+    (< (abs (- 1 (/ old-guess guess))) 0.001))
+  (define (average x y) (/ (+ x y) 2))
+  (define (improve guess)
+    (average guess (/ x guess)))
+  (define (sqrt-iter old-guess guess)
+    (if (good-enough? old-guess guess)
+        guess
+        (sqrt-iter guess (improve guess))))
+  (sqrt-iter 0.0 1.0))

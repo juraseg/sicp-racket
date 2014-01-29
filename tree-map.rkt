@@ -1,0 +1,37 @@
+#lang racket
+(define (square x) (* x x))
+
+(define (scale-tree tree factor)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (* tree factor))
+        (else (cons (scale-tree (car tree)
+                                factor)
+                    (scale-tree (cdr tree)
+                                factor)))))
+
+(define (scale-tree2 tree factor)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (scale-tree2 sub-tree factor)
+             (* sub-tree factor)))
+       tree))
+
+(define (square-tree tree)
+  (cond ((null? tree) null)
+        ((not (pair? tree)) (square tree))
+        (else (cons (square-tree (car tree))
+                    (square-tree (cdr tree))))))
+
+(define (square-tree2 tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (square-tree2 sub-tree)
+             (square sub-tree)))
+       tree))
+
+(define (tree-map proc tree)
+  (map (lambda (sub-tree)
+         (if (pair? sub-tree)
+             (tree-map proc sub-tree)
+             (proc sub-tree)))
+       tree))
