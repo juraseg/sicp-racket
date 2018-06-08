@@ -1,0 +1,46 @@
+#lang racket
+
+(require "serializer.rkt")
+
+; bank account functions
+(define (make-account-and-serializer balance id)
+  (define (withdraw amount)
+    (if (>= balance amount)
+        (begin (set! balance (- balance amount))
+               balance)
+        "Not enough money on account"))
+  (define (deposit amount)
+    (set! balance (+ balance amount))
+    balance)
+  (let ((balance-serializer (make-serializer)))
+    (define (dispatch m)
+      (cond ((eq? m 'withdraw) withdraw)
+            ((eq? m 'deposit) deposit)
+            ((eq? m 'balance) balance)
+            ((eq? m 'get-id) id)
+            ((eq? m 'serializer) balance-serializer)
+            (else (error "Unknow request -- MAKE-ACCOUNT" m))))
+    dispatch))
+
+(define (deposit account amount)
+  (let ((s (account 'serializer))
+        (d (account 'deposit)))
+    ((s d ) amount)))
+
+(define (exchange account1 account2)
+  (let ((difference (- (account1 'balance)
+                       (account2 'balance))))
+    ((account1 'withdraw) difference)
+    ((account2 'deposit) difference)))
+
+(define (serialized-exchange account1 account2)
+  (let ((s1 (account1 'serializer))
+        (s2 (account2 'serializer))
+        (id1 (account1 'get-id))
+        (id2 (account2 'get-id)))
+    (cond ((< id1 id2)
+           ((s1 (s2 exchange)) account1 account2))
+          ((< id2 id1)
+           ((s2 (s1 exchange)) account1 account2))
+          (else (error "Account ids are equal -- SERIALIZED-EXCHANGE" 
+                       (list id1 id2))))))
